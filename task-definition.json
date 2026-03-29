@@ -1,0 +1,88 @@
+{
+    "taskDefinitionArn": "arn:aws:ecs:us-east-1:830518265866:task-definition/wordpress-task:2",
+    "containerDefinitions": [
+        {
+            "name": "wordpress",
+            "image": "wordpress:latest",
+            "cpu": 512,
+            "memory": 1024,
+            "portMappings": [
+                {
+                    "containerPort": 80,
+                    "hostPort": 80,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "WORDPRESS_DB_USER",
+                    "value": "admin"
+                },
+                {
+                    "name": "WORDPRESS_DB_HOST",
+                    "value": "web-3tier-app-poc-db.cyra6qscgl3t.us-east-1.rds.amazonaws.com:3306"
+                },
+                {
+                    "name": "WORDPRESS_DB_PASSWORD",
+                    "value": "SeninCokGucluSifren123!"
+                },
+                {
+                    "name": "WORDPRESS_DB_NAME",
+                    "value": "wordpressdb"
+                }
+            ],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/wordpress",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            },
+            "systemControls": []
+        }
+    ],
+    "family": "wordpress-task",
+    "taskRoleArn": "arn:aws:iam::830518265866:role/web-3tier-app-task-role",
+    "executionRoleArn": "arn:aws:iam::830518265866:role/web-3tier-app-execution-role",
+    "networkMode": "awsvpc",
+    "revision": 2,
+    "volumes": [],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+        {
+            "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+        },
+        {
+            "name": "ecs.capability.execution-role-awslogs"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.task-iam-role"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+        },
+        {
+            "name": "ecs.capability.task-eni"
+        }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EC2",
+        "FARGATE",
+        "MANAGED_INSTANCES"
+    ],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "512",
+    "memory": "1024",
+    "registeredAt": "2026-03-29T15:20:37.862000+03:00",
+    "registeredBy": "arn:aws:iam::830518265866:user/Furkan3"
+}
