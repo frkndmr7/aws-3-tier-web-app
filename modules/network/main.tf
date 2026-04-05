@@ -7,7 +7,7 @@ resource "aws_vpc" "this" {
   }
 }
 
-# 2. İnternet Gateway (Dış dünyaya açılan kapı)
+# 2. İnternet Gateway
 resource "aws_internet_gateway" "this" {
   vpc_id = aws_vpc.this.id
   tags = {
@@ -30,7 +30,7 @@ resource "aws_subnet" "public" {
   }
 }
 
-# 4. Route Table (Trafik nereye gitsin?)
+# 4. Route Table
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.this.id
 
@@ -80,11 +80,10 @@ resource "aws_security_group" "ecs_sg" {
   vpc_id      = aws_vpc.this.id
 
   ingress {
-    description     = "Traffic from ALB"
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    security_groups = [aws_security_group.alb_sg.id] # Zincirleme bağlantı!
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1" # Tüm protokoller
+    security_groups = [aws_security_group.alb_sg.id] # Sadece ALB'den gelirse!
   }
 
   egress {

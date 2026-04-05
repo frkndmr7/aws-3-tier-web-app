@@ -4,7 +4,7 @@ module "network" {
   environment  = "poc"
 }
 
-# Mevcut network modülünün altına ekle
+
 module "storage" {
   source            = "./modules/storage"
   project_name      = "web-3tier-app"
@@ -13,9 +13,10 @@ module "storage" {
   public_subnet_ids = module.network.public_subnet_ids
   db_sg_id          = module.network.db_sg_id
   db_password       = var.db_password
+  # cloudfront_oai_arn = module.cloudfront.oai_arn_output
 }
 
-# Storage modülünün altına ekle
+
 module "iam" {
   source        = "./modules/iam"
   project_name  = "web-3tier-app"
@@ -45,4 +46,23 @@ module "compute" {
   db_password        = var.db_password
   s3_bucket_name     = module.storage.s3_bucket_name
   efs_id             = module.storage.efs_id
+}
+
+
+resource "time_sleep" "wait_for_s3_dns" {
+  depends_on      = [module.storage]
+  create_duration = "120s" # 2 dakika bekleyelim, DNS her yere yayılsın
+}
+
+
+
+module "cloudfront" {
+  source       = "./modules/cloudfront"
+  project_name = var.project_name
+  
+  environment           = var.environment
+  s3_bucket_domain_name = module.storage.s3_bucket_domain_name
+  s3_bucket_id          = module.storage.s3_bucket_id
+  s3_bucket_arn         = module.storage.s3_bucket_arn # Bunu yeni ekledik
+  depends_on            = [time_sleep.wait_for_s3_dns]
 }

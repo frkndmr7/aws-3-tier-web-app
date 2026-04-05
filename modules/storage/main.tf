@@ -30,7 +30,7 @@ resource "aws_db_instance" "this" {
 
 # 1. Media İçerikleri için S3 Bucket
 resource "aws_s3_bucket" "media_bucket" {
-  bucket = "${var.project_name}-${var.environment}-media" # Benzersiz isim
+  bucket = "${var.project_name}-${var.environment}-media-9922" # Benzersiz isim
 
   tags = {
     Name = "${var.project_name}-media-storage"
@@ -46,6 +46,11 @@ resource "aws_s3_bucket_public_access_block" "media_access" {
   ignore_public_acls      = false
   restrict_public_buckets = false
 }
+
+# 3. CloudFront'un içeri girmesini sağlayan "Bucket Policy" (YENİ)
+
+
+
 
 # 2. EFS (Sadece Plugins ve Themes için - Minimum Boyutta)
 resource "aws_efs_file_system" "wp_shared_files" {

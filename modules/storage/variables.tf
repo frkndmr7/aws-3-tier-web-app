@@ -21,3 +21,5 @@ variable "db_password" {
   type        = string
   # default kısmını sildik, Terraform artık bunu bize soracak
 }
+
+
