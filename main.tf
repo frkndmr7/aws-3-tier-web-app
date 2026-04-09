@@ -13,6 +13,9 @@ module "storage" {
   public_subnet_ids = module.network.public_subnet_ids
   db_sg_id          = module.network.db_sg_id
   db_password       = var.db_password
+  ecs_sg_id          = module.network.ecs_sg_id
+
+  
   # cloudfront_oai_arn = module.cloudfront.oai_arn_output
 }
 
@@ -46,12 +49,13 @@ module "compute" {
   db_password        = var.db_password
   s3_bucket_name     = module.storage.s3_bucket_name
   efs_id             = module.storage.efs_id
+  efs_access_point_id = module.storage.efs_access_point_id
 }
 
 
 resource "time_sleep" "wait_for_s3_dns" {
   depends_on      = [module.storage]
-  create_duration = "120s" # 2 dakika bekleyelim, DNS her yere yayılsın
+  create_duration = "60s" # 2 dakika bekleyelim, DNS her yere yayılsın
 }
 
 

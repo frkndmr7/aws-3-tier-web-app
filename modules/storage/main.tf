@@ -63,10 +63,56 @@ resource "aws_efs_file_system" "wp_shared_files" {
   }
 }
 
+
+resource "aws_security_group" "efs_sg" {
+  name        = "${var.project_name}-efs-sg"
+  description = "Allow NFS traffic from ECS to EFS"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port       = 2049
+    to_port         = 2049
+    protocol        = "tcp"
+    # BURASI KRİTİK: Sadece ECS Task'larının SG'sine izin veriyoruz
+    #security_groups = [var.ecs_sg_id]
+    cidr_blocks = [var.vpc_cidr] 
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+
+
+resource "aws_efs_access_point" "wp_uploads" {
+  file_system_id = aws_efs_file_system.wp_shared_files.id
+
+  # Bu kısım sihirli dokunuş: Gelen herkesi www-data (33) yapıyoruz
+  posix_user {
+    uid = 33
+    gid = 33
+  }
+
+  root_directory {
+    path = "/wp-uploads"
+    creation_info {
+      owner_uid   = 33
+      owner_gid   = 33
+      permissions = "755"
+    }
+  }
+}
+
+
+
 # EFS Dağıtım Noktaları (Önceki kodla aynı)
 resource "aws_efs_mount_target" "this" {
   count           = length(var.public_subnet_ids)
   file_system_id  = aws_efs_file_system.wp_shared_files.id
   subnet_id       = var.public_subnet_ids[count.index]
-  security_groups = [var.db_sg_id]
+  security_groups = [aws_security_group.efs_sg.id]
 }

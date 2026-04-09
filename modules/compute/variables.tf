@@ -12,6 +12,10 @@ variable "db_user" {}
 variable "db_password" {}
 variable "s3_bucket_name" {}
 variable "efs_id" {}
+variable "efs_access_point_id" {
+  type        = string
+  description = "The ID of the EFS Access Point"
+}
 
 variable "aws_region" {
   default = "us-east-1" # Eğer us-east-1'de kalacaksan böyle kalsın

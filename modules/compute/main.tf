@@ -76,13 +76,25 @@ resource "aws_iam_role_policy" "ecs_s3_policy" {
           "s3:DeleteObject",
           "s3:ListBucket",
           "s3:GetBucketLocation",
-          "s3:GetBucketAcl"
+          "s3:GetBucketAcl",
+          "s3:PutObjectAcl"
         ]
         Effect   = "Allow"
         Resource = [
-          "arn:aws:s3:::web-3tier-app-poc-media",
-          "arn:aws:s3:::web-3tier-app-poc-media/*"
+          "arn:aws:s3:::web-3tier-app-poc-media-9922",
+          "arn:aws:s3:::web-3tier-app-poc-media-9922/*"
         ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "elasticfilesystem:ClientMount",  # EFS'yi bağlamak için şart
+          "elasticfilesystem:ClientWrite",  # EFS'ye dosya yazmak için şart
+          "elasticfilesystem:ClientRootAccess" # Access Point ile tam yetki için önerilir
+        ]
+        # Resource kısmında '*' kullanabilirsin veya EFS ARN'ini yazabilirsin
+        # Şimdilik sorun yaşamamak için '*' (hepsi) diyelim
+        Resource = "*" 
       }
     ]
   })
@@ -101,9 +113,19 @@ resource "aws_ecs_task_definition" "wordpress" {
   cpu                      = "512" 
   memory                   = "1024"
   execution_role_arn       = var.execution_role_arn
-  
-  
   task_role_arn            = aws_iam_role.ecs_task_role.arn
+
+  volume {
+    name = "wp-storage"
+    efs_volume_configuration {
+      file_system_id = var.efs_id # EFS ID'sini dışarıdan (root main.tf) paslaman lazım
+      transit_encryption = "ENABLED"
+      authorization_config {
+        access_point_id = var.efs_access_point_id # Bu ID'yi modülden output olarak almalısın
+        iam             = "ENABLED"
+      }
+    }
+  }
 
   container_definitions = jsonencode([
     {
@@ -116,11 +138,28 @@ resource "aws_ecs_task_definition" "wordpress" {
         containerPort = 80
         hostPort      = 80
       }]
+
+      mountPoints = [
+        {
+          sourceVolume  = "wp-storage"
+          containerPath = "/var/www/html/wp-content/uploads" # Sadece wp-content'i paylaşıyoruz!
+          readOnly      = false
+        }
+      ]
+
       environment = [
         { name = "WORDPRESS_DB_HOST", value = var.db_endpoint },
         { name = "WORDPRESS_DB_USER", value = var.db_user },
         { name = "WORDPRESS_DB_PASSWORD", value = var.db_password },
-        { name = "WORDPRESS_DB_NAME", value = var.db_name }
+        { name = "WORDPRESS_DB_NAME", value = var.db_name },
+        { name = "WORDPRESS_TABLE_PREFIX", value = "wp_v2_" },
+
+
+
+        {
+          name  = "WORDPRESS_CONFIG_EXTRA"
+          value = "define('WP_DEBUG', true);"
+        }
       ]
       logConfiguration = {
         logDriver = "awslogs"

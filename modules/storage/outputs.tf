@@ -27,4 +27,9 @@ output "s3_bucket_id" {
   value       = aws_s3_bucket.media_bucket.id
 }
 
+output "efs_access_point_id" {
+  description = "EFS Access Point ID for WordPress uploads"
+  value       = aws_efs_access_point.wp_uploads.id
+}
+
 

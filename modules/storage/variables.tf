@@ -6,6 +6,8 @@ variable "public_subnet_ids" {
 }
 variable "db_sg_id" {}
 
+variable "ecs_sg_id" {}
+
 variable "db_name" {
   default = "wordpressdb"
 }
@@ -20,6 +22,11 @@ variable "db_password" {
   description = "RDS şifresi"
   type        = string
   # default kısmını sildik, Terraform artık bunu bize soracak
+}
+
+variable "vpc_cidr" {
+  type    = string
+  default = "10.0.0.0/16"
 }
 
 

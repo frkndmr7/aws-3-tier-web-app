@@ -44,6 +44,14 @@ resource "aws_iam_policy" "s3_access" {
         Action   = ["s3:PutObject", "s3:GetObject", "s3:DeleteObject", "s3:ListBucket"]
         Effect   = "Allow"
         Resource = [var.s3_bucket_arn, "${var.s3_bucket_arn}/*"]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket",
+          "s3:GetBucketLocation" # İŞTE EKSİK OLAN YETKİ BURASI!
+        ]
+        Resource = var.s3_bucket_arn # Kovanın kendisi için
       }
     ]
   })
