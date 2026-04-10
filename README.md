@@ -11,12 +11,10 @@
 - [Network Design (VPC & Subnets)](#-network-design-vpc--subnets)
 - [Traffic Flow](#-traffic-flow)
 - [Security Strategy](#-security-strategy)
-- [Storage Architecture](#-storage-architecture)
 - [CI/CD Pipeline](#-cicd-pipeline)
 - [Cost Estimation](#-cost-estimation)
 - [Project Phases](#-project-phases)
-- [Alternative Approaches](#-alternative-approaches)
-- [Tech Stack](#-tech-stack)
+
 
 ---
 
@@ -44,8 +42,9 @@ The goal of this project was to design and provision a **production-ready, auto-
 
 ## 🏗️ Architecture Overview
 
-![Architecture Diagram](<img width="1307" height="924" alt="image" src="https://github.com/user-attachments/assets/94c6ca8a-5483-4298-8e71-096b58807071" />
-)
+<img width="1307" height="924" alt="image" src="https://github.com/user-attachments/assets/9f41497a-84a8-4619-a0a8-9849736d040b" />
+
+
 
 The architecture is built on a **multi-AZ, containerized, serverless compute model** using AWS Fargate inside a custom VPC across two Availability Zones.
 
@@ -184,25 +183,8 @@ Layer 4: Data Security
 
 ---
 
-## 💾 Storage Architecture
-
-The project uses a **hybrid storage approach** optimized for WordPress:
-
-```
-WordPress File Types & Storage Mapping:
-─────────────────────────────────────────────────────
-wp-core / wp-admin / wp-includes  →  EFS (shared, read-only for app)
-wp-content/themes, plugins        →  EFS (shared across all containers)
-wp-content/uploads (media)        →  S3  (offloaded, served via CloudFront)
-wp-config.php / secrets           →  AWS Secrets Manager / SSM
-Database                          →  RDS MariaDB (Multi-AZ)
-Session cache / object cache      →  ElastiCache Memcached
-Daily snapshots                   →  AWS Backup → S3 Glacier
 ─────────────────────────────────────────────────────
 ```
-
-**Why EFS for WordPress files?**
-Multiple Fargate tasks running in different AZs need access to the same `wp-content` directory. EFS provides a POSIX-compliant shared filesystem mounted via NFS, allowing all containers to read/write the same files consistently.
 
 ---
 
