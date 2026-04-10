@@ -3,6 +3,8 @@
 
 > *To validate the critical components of the infrastructure design and service integrations, the core layers of the project were implemented in Terraform during the POC (Proof of Concept) phase. The codebase serves as proof of a scalable and stateless structure.*
 
+> Note: All AWS resources shown in the evidence screenshots were decommissioned immediately after testing to optimize costs. 
+
 ---
 
 ## 📋 Table of Contents
