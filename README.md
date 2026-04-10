@@ -1,6 +1,8 @@
 # 🚀 High-Traffic WordPress Infrastructure on AWS
 ### hosting-101.com | Scalable & Secure Architecture for Tens of Thousands of Concurrent Users
 
+> *To validate the critical components of the infrastructure design and service integrations, the core layers of the project were implemented in Terraform during the POC (Proof of Concept) phase. The codebase serves as proof of a scalable and stateless structure.*
+
 ---
 
 ## 📋 Table of Contents
@@ -236,6 +238,54 @@ Developer Push (GitHub/CodeCommit)
 
 
 ---
+
+
+Proof of Concept (POC) Implementation
+This section was implemented to validate the most critical and risky components of the designed main architecture. Within the scope of the POC, the system's stateless nature and AWS service integrations were tested.
+
+The POC process is built on these 3 core pillars:
+
+Compute: WordPress is run on AWS Fargate (Serverless ECS), minimizing server management.
+
+<img width="1501" height="352" alt="image" src="https://github.com/user-attachments/assets/70883c14-29ca-4296-9e86-5c4e9da5aef0" />
+
+
+Database: Data is securely stored on RDS MariaDB within an isolated Private Subnet.
+
+
+Shared & Static Files: Write permissions are optimized for the */wp-content/uploads folder using an EFS Access Point.
+
+Media files are migrated to S3 using the WP Offload Media plugin and IAM Role authorization.
+
+
+Verification and Evidence
+
+The system's success has been verified with the following metrics:
+
+CloudFront Distribution: It has been confirmed that media files are served directly via CloudFront URLs instead of ALB.
+
+
+Health Checks: ECS Tasks and Load Balancer Target Groups were observed to be in a "Healthy" state.
+
+<img width="1566" height="458" alt="image" src="https://github.com/user-attachments/assets/c0b08c6e-5935-4058-b1b1-6ad94a19ad83" />
+
+
+Database Connectivity: It has been confirmed that WordPress seamlessly connects with RDS and writes data.
+
+<img width="1530" height="294" alt="image" src="https://github.com/user-attachments/assets/ba1b3792-306f-4e70-9a9a-b87d5f99570e" />
+
+
+
+Automation has been preferred over manual processes for the speed and reliability of the POC (Proof of Concept) process:
+
+Infrastructure as Code (IaC): All AWS resources have been modularized with Terraform, reducing manual configuration errors (human errors) to zero.
+
+Version Control & Collaboration: The codebase is versioned on GitHub, ensuring traceability of every change.
+
+Deployment Pipeline: After each "Push" operation (GitHub Actions), the infrastructure is automatically validated (Terraform Plan), establishing a secure deployment process.
+
+
+
 
 ## 📐 Project Phases
 
